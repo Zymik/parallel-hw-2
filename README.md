@@ -1,3 +1,4 @@
-Разогнать до х3 не получилось,  получилось чуть быстрее:
-Total seq: 45212348
-Total parallel: 42785738
+Получилось 2.5:
+Seq bfs average time: 73833.0
+Par bfs average time: 29209.8
+ParTime/SeqTime: 2.5276790666146294
