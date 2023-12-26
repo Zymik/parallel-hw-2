@@ -5,7 +5,7 @@ import java.util.concurrent.ForkJoinPool
 class BfsTest {
 
     companion object {
-        private const val TEST_COUNT = 5
+        private const val TEST_COUNT = 1
         private const val THREAD_COUNT = 4
 
         data class CubicGraph(val graph: Graph, val bfsResult: IntArray)

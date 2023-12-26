@@ -4,13 +4,14 @@ import java.util.concurrent.atomic.AtomicIntegerArray
 fun seqBfs(start: Int, graph: Graph): IntArray {
     val queue = ArrayDeque<Int>()
     val result = IntArray(graph.graphList.size)
-    val visited  = mutableSetOf<Int>()
-    visited += start
+    val visited = BooleanArray(graph.graphList.size)
+    visited[start] = true
     queue.addLast(start)
     while (queue.isNotEmpty()) {
         val id = queue.removeFirst()
         graph.iterateOverNeighbours(id) { i ->
-            if (visited.add(i)) {
+            if (!visited[i]) {
+                visited[i] = true
                 result[i] = result[id] + 1
                 queue.addLast(i)
             }
