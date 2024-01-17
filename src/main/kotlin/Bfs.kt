@@ -3,13 +3,13 @@ import java.util.concurrent.atomic.AtomicIntegerArray
 
 fun seqBfs(start: Int, graph: Graph): IntArray {
     val queue = ArrayDeque<Int>()
-    val result = IntArray(graph.graphList.size)
-    val visited = BooleanArray(graph.graphList.size)
+    val result = IntArray(graph.size)
+    val visited = BooleanArray(graph.size)
     visited[start] = true
     queue.addLast(start)
     while (queue.isNotEmpty()) {
         val id = queue.removeFirst()
-        graph.iterateOverNeighbours(id) { i ->
+        graph[id].forEach { i ->
             if (!visited[i]) {
                 visited[i] = true
                 result[i] = result[id] + 1
@@ -20,18 +20,18 @@ fun seqBfs(start: Int, graph: Graph): IntArray {
     return result
 }
 
-class ParBfs(private val graph: Graph, private val start: Int): RecursiveTask<IntArray>() {
+class ParBfs(private val graph: Graph, private val start: Int) : RecursiveTask<IntArray>() {
     override fun compute(): IntArray {
-        val visited = AtomicIntegerArray(graph.graphList.size)
+        val visited = AtomicIntegerArray(graph.size)
         visited.set(start, 1)
-        val result = IntArray(graph.graphList.size)
+        val result = IntArray(graph.size)
         var frontier = IntArray(1) { start + 1 }
         var layer = 1
         while (frontier.isNotEmpty()) {
             val next = IntArray(frontier.size)
             PFor(frontier) { it, i ->
                 if (it > 0) {
-                    next[i] = graph.graphList[it - 1].size
+                    next[i] = graph[it - 1].size
                 } else {
                     next[i] = 0
                 }
@@ -45,9 +45,9 @@ class ParBfs(private val graph: Graph, private val start: Int): RecursiveTask<In
                     val startPos = if (i == 0) {
                         0
                     } else {
-                        scanned[i - 1]
+                        scanned[i]
                     }
-                    graph.graphList[front].forEachIndexed { j, v ->
+                    graph[front].forEachIndexed { j, v ->
                         if (visited.compareAndSet(v, 0, 1)) {
                             nextFrontier[startPos + j] = v + 1
                             result[v] = layer

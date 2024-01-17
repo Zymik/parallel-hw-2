@@ -8,41 +8,17 @@ class BfsTest {
         private const val TEST_COUNT = 1
         private const val THREAD_COUNT = 4
 
-        data class CubicGraph(val graph: Graph, val bfsResult: IntArray)
-
-        private fun buildCubicGraph(size: Int): CubicGraph {
+        private fun getCubeGraphBfsResult(size: Int): IntArray {
             val result = IntArray(size * size * size)
-            val graphList = Array(size * size * size) { IntArray(0) }
             for (i in 0 until size) {
                 for (j in 0 until size) {
                     for (k in 0 until size) {
                         val pos = getPos(i, j, k, size)
                         result[pos] = i + j + k
-                        val list = mutableListOf<Int>()
-                        if (i != 0) {
-                            list += getPos(i - 1, j, k, size)
-                        }
-                        if (j != 0) {
-                            list += getPos(i, j - 1, k, size)
-                        }
-                        if (k != 0) {
-                            list += getPos(i, j, k - 1, size)
-                        }
-
-                        if (i != size - 1) {
-                            list += getPos(i + 1, j, k, size)
-                        }
-                        if (j != size - 1) {
-                            list += getPos(i, j + 1, k, size)
-                        }
-                        if (k != size - 1) {
-                            list += getPos(i, j, k + 1, size)
-                        }
-                        graphList[pos] = list.toIntArray()
                     }
                 }
             }
-            return CubicGraph(Graph(graphList), result)
+            return result
         }
 
         private fun getPos(i: Int, j: Int, k: Int, size: Int): Int = i + j * size + k * size * size
@@ -52,26 +28,26 @@ class BfsTest {
 
     @Test
     fun testSeqBfs() {
-        val graph = buildCubicGraph(200)
-        val result = seqBfs(0, graph.graph)
-        result.contentEquals(graph.bfsResult)
+        val bfsResult = getCubeGraphBfsResult(200)
+        val result = seqBfs(0, CubeGraph(200))
+        result.contentEquals(bfsResult)
     }
 
     @Test
     fun testForkJoinBfs() {
-        val graph = buildCubicGraph(200)
-        val result = runForkJoinBfs(graph.graph)
-        result.contentEquals(graph.bfsResult)
+        val bfsResult = getCubeGraphBfsResult(200)
+        val result = runForkJoinBfs(CubeGraph(200))
+        result.contentEquals(bfsResult)
     }
 
     @Test
     fun performanceTest() {
-        val graph = buildCubicGraph(500)
+        val graph = CubeGraph(500)
         var seqTime = 0L
         for (i in 1..TEST_COUNT) {
             println("Iteration $i sequential")
             seqTime += countMillis {
-                seqBfs(0, graph.graph)
+                seqBfs(0, graph)
             }
         }
         println("Seq bfs average time: ${seqTime.toDouble() / TEST_COUNT}")
@@ -79,7 +55,7 @@ class BfsTest {
         for (i in 1..TEST_COUNT) {
             println("Iteration $i parallel")
             parTime += countMillis {
-                runForkJoinBfs(graph.graph)
+                runForkJoinBfs(graph)
             }
         }
         println("Par bfs average time: ${parTime.toDouble() / TEST_COUNT} ")
