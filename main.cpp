@@ -86,7 +86,7 @@ std::vector<std::size_t> bfs_par(std::vector<std::vector<std::size_t>> &ways) {
         parlay::sequence<std::size_t> scanned(frontier.size());
 
         parlay::parallel_for(0, scanned.size(),
-                             [&scanned, &ways](std::size_t i) {
+                             [&](std::size_t i) {
                                  scanned[i] = ways[i].size();
                              }
         );
@@ -95,7 +95,7 @@ std::vector<std::size_t> bfs_par(std::vector<std::vector<std::size_t>> &ways) {
         parlay::sequence<std::size_t> next_frontier(s);
 
         parlay::parallel_for(0, frontier.size(),
-                             [&frontier, &scanned, &marked, &next_frontier, &ways, &result, layer](
+                             [&](
                                      std::size_t i) {
                                  std::size_t front = frontier[i] - 1;
                                  std::size_t start_pos = 0;
@@ -115,7 +115,7 @@ std::vector<std::size_t> bfs_par(std::vector<std::vector<std::size_t>> &ways) {
                              }
         );
         layer++;
-        frontier = parlay::filter(next_frontier, [&](std::size_t u) { return u > 0; });
+        frontier = parlay::filter(next_frontier, [](std::size_t u) { return u > 0; });
     }
     return result;
 }
