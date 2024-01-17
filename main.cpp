@@ -87,7 +87,7 @@ std::vector<std::size_t> bfs_par(std::vector<std::vector<std::size_t>> &ways) {
 
         parlay::parallel_for(0, scanned.size(),
                              [&](std::size_t i) {
-                                 scanned[i] = ways[i].size();
+                                 scanned[i] = ways[frontier[i] - 1].size();
                              }
         );
 
